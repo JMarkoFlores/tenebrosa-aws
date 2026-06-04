@@ -1,0 +1,20 @@
+# Usar imagen Node.js estable
+FROM node:20-alpine
+
+# Directorio de trabajo
+WORKDIR /app
+
+# Copiar archivos de dependencias
+COPY backend/package*.json ./
+
+# Instalar dependencias
+RUN npm ci
+
+# Copiar el resto del código del backend
+COPY backend/ .
+
+# Exponer el puerto 3001
+EXPOSE 3001
+
+# Comando para iniciar el backend
+CMD ["npm", "start"]

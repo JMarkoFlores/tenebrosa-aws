@@ -1,0 +1,35 @@
+# Etapa 1: Compilar la aplicación React/Vite
+FROM node:20-alpine AS build
+
+# Directorio de trabajo
+WORKDIR /app
+
+# Copiar archivos de dependencias
+COPY frontend/package*.json ./
+
+# Instalar dependencias
+RUN npm ci
+
+# Copiar el resto del código del frontend
+COPY frontend/ .
+
+# Argumento para VITE_API_URL (se pasa en build time)
+ARG VITE_API_URL
+
+# Establecer variable de entorno para el build
+ENV VITE_API_URL=$VITE_API_URL
+
+# Compilar la aplicación
+RUN npm run build
+
+# Etapa 2: Servir archivos estáticos con Nginx
+FROM nginx:alpine
+
+# Copiar los archivos compilados desde la etapa build
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Exponer el puerto 80
+EXPOSE 80
+
+# Comando para iniciar Nginx
+CMD ["nginx", "-g", "daemon off;"]
