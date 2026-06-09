@@ -99,3 +99,8 @@
 .tabla tbody tr:hover {
   background-color: #d5dbdb;
 }
+
+.tabla tbody tr.fila-saldo-inicial {
+  background-color: #fff3cd;
+  font-weight: 600;
+}

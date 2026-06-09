@@ -38,9 +38,7 @@ pool.on("error", (err) => {
 app.get("/api/productos", async (req, res) => {
   console.time("DB_PRODUCTOS");
   try {
-    const result = await pool.query(
-      'SELECT DISTINCT d."Producto", p."Descripcion" FROM detadoc d INNER JOIN producto p ON d."Producto" = p."Producto" ORDER BY d."Producto"',
-    );
+    const result = await pool.query("SELECT * FROM public.fn_listar_productos()");
     console.timeEnd("DB_PRODUCTOS");
     res.json(result.rows);
   } catch (err) {
@@ -53,22 +51,29 @@ app.get("/api/productos", async (req, res) => {
 });
 
 // Consultar kardex
-app.post("/api/kardex", async (req, res) => {
+app.get("/api/kardex", async (req, res) => {
   console.time("TOTAL_REQUEST");
-  const { fecha1, fecha2, producto } = req.body;
+  const { fechaInicio, fechaFin, producto } = req.query;
 
-  if (!fecha1 || !fecha2 || !producto) {
+  if (!fechaInicio || !fechaFin || !producto) {
     console.timeEnd("TOTAL_REQUEST");
     return res
       .status(400)
-      .json({ error: "Faltan parametros: fecha1, fecha2, producto" });
+      .json({ error: "Faltan parametros: fechaInicio, fechaFin, producto" });
+  }
+
+  if (fechaInicio > fechaFin) {
+    console.timeEnd("TOTAL_REQUEST");
+    return res
+      .status(400)
+      .json({ error: "La fecha inicial no puede ser mayor que la fecha final" });
   }
 
   try {
     console.time("DB_KARDEX");
     const result = await pool.query(
-      "SELECT * FROM kardex_consulta($1, $2, $3)",
-      [fecha1, fecha2, producto],
+      "SELECT * FROM public.kardex_consulta($1::DATE, $2::DATE, $3::CHAR(4))",
+      [fechaInicio, fechaFin, producto],
     );
     console.timeEnd("DB_KARDEX");
     console.timeEnd("TOTAL_REQUEST");

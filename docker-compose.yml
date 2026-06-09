@@ -1,26 +1,26 @@
-version: '3.8'
-
 services:
   backend:
     build:
       context: .
       dockerfile: docker/Dockerfile.backend
+    env_file:
+      - .env
     ports:
       - "3001:3001"
     environment:
-      - PORT=3001
-      - DB_HOST=tenebrosa.c5gcys4o2llz.us-east-2.rds.amazonaws.com
-      - DB_PORT=5432
-      - DB_NAME=postgres
-      - DB_USER=postgres
-      - DB_PASSWORD=Tenebrosa2026!
+      PORT: ${PORT:-3001}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
 
   frontend:
     build:
       context: .
       dockerfile: docker/Dockerfile.frontend
       args:
-        VITE_API_URL: http://localhost:3001
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3001}
     ports:
       - "8080:80"
     depends_on:
