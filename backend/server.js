@@ -38,7 +38,9 @@ pool.on("error", (err) => {
 app.get("/api/productos", async (req, res) => {
   console.time("DB_PRODUCTOS");
   try {
-    const result = await pool.query("SELECT * FROM public.fn_listar_productos()");
+    const result = await pool.query(
+      "SELECT * FROM public.fn_listar_productos()",
+    );
     console.timeEnd("DB_PRODUCTOS");
     res.json(result.rows);
   } catch (err) {
@@ -66,13 +68,15 @@ app.get("/api/kardex", async (req, res) => {
     console.timeEnd("TOTAL_REQUEST");
     return res
       .status(400)
-      .json({ error: "La fecha inicial no puede ser mayor que la fecha final" });
+      .json({
+        error: "La fecha inicial no puede ser mayor que la fecha final",
+      });
   }
 
   try {
     console.time("DB_KARDEX");
     const result = await pool.query(
-      "SELECT * FROM public.kardex_consulta($1::DATE, $2::DATE, $3::CHAR(4))",
+      "SELECT * FROM public.fn_kardex_consulta($1::DATE, $2::DATE, $3::CHAR(4))",
       [fechaInicio, fechaFin, producto],
     );
     console.timeEnd("DB_KARDEX");
