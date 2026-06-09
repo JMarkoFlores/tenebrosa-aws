@@ -1,18 +1,22 @@
 import { memo, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import "./App.css";
+import DashboardModule from "./components/DashboardModule";
+import ProductosModule from "./components/ProductosModule";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
-const MODULES = [
-  "Dashboard",
-  "Productos",
-  "Documentos",
-  "Kardex",
-  "Reportes",
-  "Mantenimiento",
-  "Configuracion",
-];
+// const MODULES = [
+//   "Dashboard",
+//   "Productos",
+//   "Documentos",
+//   "Kardex",
+//   "Reportes",
+//   "Mantenimiento",
+//   "Configuracion",
+// ];
+
+const MODULES = ["Dashboard", "Productos", "Kardex"];
 
 const Row = memo(({ row }) => (
   <tr className={row.documento === "SALDO INICIAL" ? "fila-saldo-inicial" : ""}>
@@ -156,7 +160,9 @@ function App() {
 
       setResultados(normalizados);
       if (normalizados.length === 0) {
-        setMensaje("No se encontraron registros para los filtros seleccionados.");
+        setMensaje(
+          "No se encontraron registros para los filtros seleccionados.",
+        );
       }
     } catch (err) {
       setResultados([]);
@@ -213,7 +219,10 @@ function App() {
       stockInicial,
       totalEntradas,
       totalSalidas,
-      stockFinal: resultados.length > 0 ? Number(resultados[resultados.length - 1].stock) || 0 : 0,
+      stockFinal:
+        resultados.length > 0
+          ? Number(resultados[resultados.length - 1].stock) || 0
+          : 0,
     };
   }, [resultados]);
 
@@ -363,7 +372,9 @@ function App() {
           <div>
             <span className="eyebrow">Panel administrativo</span>
             <h2>
-              {activeModule === "Kardex" ? "Kardex / Movimientos" : activeModule}
+              {activeModule === "Kardex"
+                ? "Kardex / Movimientos"
+                : activeModule}
             </h2>
           </div>
 
@@ -375,7 +386,11 @@ function App() {
               <input type="text" placeholder="Buscar" readOnly />
             </div>
 
-            <button type="button" className="icon-button" aria-label="Notificaciones">
+            <button
+              type="button"
+              className="icon-button"
+              aria-label="Notificaciones"
+            >
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M12 22a2.5 2.5 0 0 0 2.4-2h-4.8A2.5 2.5 0 0 0 12 22Zm6-6V11a6 6 0 1 0-12 0v5L4 18v1h16v-1l-2-2Z" />
               </svg>
@@ -389,7 +404,15 @@ function App() {
         </header>
 
         <div className="content-area">
-          {activeModule === "Kardex" ? renderKardexModule() : renderPlaceholderModule()}
+          {activeModule === "Dashboard" ? (
+            <DashboardModule />
+          ) : activeModule === "Productos" ? (
+            <ProductosModule />
+          ) : activeModule === "Kardex" ? (
+            renderKardexModule()
+          ) : (
+            renderPlaceholderModule()
+          )}
         </div>
       </main>
     </div>

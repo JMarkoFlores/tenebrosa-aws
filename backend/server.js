@@ -52,6 +52,44 @@ app.get("/api/productos", async (req, res) => {
   }
 });
 
+// Resumen del dashboard
+app.get("/api/dashboard/resumen", async (req, res) => {
+  console.time("DB_DASHBOARD_RESUMEN");
+  try {
+    const result = await pool.query(
+      "SELECT * FROM public.fn_dashboard_resumen()",
+    );
+    console.timeEnd("DB_DASHBOARD_RESUMEN");
+    res.json(result.rows[0] || {});
+  } catch (err) {
+    console.timeEnd("DB_DASHBOARD_RESUMEN");
+    console.error("Error en /api/dashboard/resumen:", err.message);
+    res.status(500).json({
+      error: "Error al obtener el resumen del dashboard",
+      detalle: err.message,
+    });
+  }
+});
+
+// Lista de productos para el modulo Productos
+app.get("/api/productos/modulo", async (req, res) => {
+  console.time("DB_PRODUCTOS_MODULO");
+  try {
+    const result = await pool.query(
+      "SELECT * FROM public.fn_listar_productos_modulo()",
+    );
+    console.timeEnd("DB_PRODUCTOS_MODULO");
+    res.json(result.rows);
+  } catch (err) {
+    console.timeEnd("DB_PRODUCTOS_MODULO");
+    console.error("Error en /api/productos/modulo:", err.message);
+    res.status(500).json({
+      error: "Error al obtener la lista de productos del modulo",
+      detalle: err.message,
+    });
+  }
+});
+
 // Consultar kardex
 app.get("/api/kardex", async (req, res) => {
   console.time("TOTAL_REQUEST");
