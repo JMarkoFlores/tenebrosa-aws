@@ -16,6 +16,31 @@ import {
 } from "recharts";
 import { getDashboardResumen } from "../services/api";
 
+function DashboardTooltip({ active, payload, label, valueFormatter }) {
+  if (!active || !payload?.length) {
+    return null;
+  }
+
+  const item = payload[0];
+  const toneColor = item.payload?.fill || item.color || "#3a7bf6";
+
+  return (
+    <div className="dashboard-tooltip">
+      <div className="dashboard-tooltip-header">
+        <span
+          className="dashboard-tooltip-dot"
+          style={{ backgroundColor: toneColor }}
+        />
+        <strong>{label || item.name}</strong>
+      </div>
+      <div className="dashboard-tooltip-body">
+        <span>Valor actual</span>
+        <strong>{valueFormatter(item.value)}</strong>
+      </div>
+    </div>
+  );
+}
+
 function DashboardIcon({ type }) {
   switch (type) {
     case "productos":
@@ -286,6 +311,7 @@ function DashboardModule() {
               style={{
                 background: `linear-gradient(180deg, ${tone.soft} 0%, #ffffff 72%)`,
                 borderTop: `4px solid ${tone.accent}`,
+                animationDelay: `${metrics.indexOf(card) * 90}ms`,
               }}
             >
               <div className="dashboard-card-top">
@@ -349,12 +375,22 @@ function DashboardModule() {
 
           <div className="dashboard-chart-box">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={generalChartData}>
+              <BarChart data={generalChartData} barCategoryGap={18}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e7edf5" />
                 <XAxis dataKey="name" tickLine={false} axisLine={false} />
                 <YAxis tickLine={false} axisLine={false} />
-                <Tooltip formatter={(value) => formatMetric(value)} />
-                <Bar dataKey="value" radius={[10, 10, 0, 0]}>
+                <Tooltip
+                  cursor={{ fill: "rgba(58, 123, 246, 0.08)" }}
+                  content={
+                    <DashboardTooltip valueFormatter={formatMetric} />
+                  }
+                />
+                <Bar
+                  dataKey="value"
+                  radius={[10, 10, 0, 0]}
+                  animationDuration={900}
+                  animationEasing="ease-out"
+                >
                   {generalChartData.map((entry) => (
                     <Cell key={entry.name} fill={entry.fill} />
                   ))}
@@ -375,7 +411,7 @@ function DashboardModule() {
           <div className="dashboard-chart-box dashboard-chart-box-donut">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Tooltip formatter={(value) => formatMetric(value)} />
+                <Tooltip content={<DashboardTooltip valueFormatter={formatMetric} />} />
                 <Legend verticalAlign="bottom" height={24} />
                 <Pie
                   data={movementChartData}
@@ -384,6 +420,8 @@ function DashboardModule() {
                   innerRadius={70}
                   outerRadius={100}
                   paddingAngle={4}
+                  animationDuration={900}
+                  animationEasing="ease-out"
                 >
                   {movementChartData.map((entry) => (
                     <Cell key={entry.name} fill={entry.fill} />
@@ -420,13 +458,15 @@ function DashboardModule() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e7edf5" />
                 <XAxis dataKey="name" tickLine={false} axisLine={false} />
                 <YAxis tickLine={false} axisLine={false} />
-                <Tooltip formatter={(value) => formatMetric(value)} />
+                <Tooltip content={<DashboardTooltip valueFormatter={formatMetric} />} />
                 <Area
                   type="monotone"
                   dataKey="value"
                   stroke="#3a7bf6"
                   fill="url(#dashboardMovement)"
                   strokeWidth={3}
+                  animationDuration={1000}
+                  animationEasing="ease-out"
                 />
               </AreaChart>
             </ResponsiveContainer>
