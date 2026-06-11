@@ -77,7 +77,7 @@ function SidebarIcon({ type }) {
 }
 
 function App() {
-  const [activeModule, setActiveModule] = useState("Kardex");
+  const [activeModule, setActiveModule] = useState("Dashboard");
   const [productos, setProductos] = useState([]);
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
